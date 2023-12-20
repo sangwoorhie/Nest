@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>docker-compose.yml</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "";
+    var thisFile = "docker-compose.yml";
+    var defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container">
+    <div class="background highlight"></div>
+<table cellpadding="0" cellspacing="0">
+  <tbody>
+    
+      <tr>
+        <td class="docs">
+          <h1>docker-compose.yml</h1>
+        </td>
+        <td class="code highlight"></td>
+      </tr>
+    
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-1" id="section-1"></a>
+</div>
+
+        </td>
+        <td class="code highlight">
+          <pre class="yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">'3.1'</span>
+
+<span class="hljs-attr">volumes:</span>
+  <span class="hljs-attr">postgres_data:</span>
+
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">postgres:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">postgres:14.7</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">postgres</span>
+</pre>
+        </td>
+      </tr>
+    
+      <tr>
+        <td class="docs">
+          <div class="pilwrap">
+  <a class="pilcrow" href="#section-2" id="section-2"></a>
+</div>
+<p>5432로 포워딩 할 경우 host os 에 설치된 postgre와 겹칠 수 있으므로 host에 설치된 postgre를 내려야함</p>
+
+        </td>
+        <td class="code highlight">
+          <pre class="yaml">    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">'5434:5432'</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_USER=postgres</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_PASSWORD=postgres</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_DB=postgres</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">postgres_data:/var/lib/postgresql/data</span>
+    <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span>
+
+</pre>
+        </td>
+      </tr>
+    
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>
