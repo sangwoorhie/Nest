@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
+import { DeleteUserResDto } from './dto/res.dto';
 
 @Injectable()
 export class UserService {
@@ -9,6 +15,14 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
+  // 회원가입 (authService와 연결)
+  async signup(email: string, password: string, name: string): Promise<User> {
+    const user = this.userRepository.create({ email, password, name });
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  // 유저 목록조회
   async findAll(page: number, size: number) {
     const users = this.userRepository.find({
       skip: (page - 1) * size,
@@ -17,20 +31,53 @@ export class UserService {
     return users;
   }
 
-  async findOne(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException('No user');
-    return user;
-  }
-
-  async create(email: string, password: string) {
-    const user = this.userRepository.create({ email, password });
-    await this.userRepository.save(user);
-    return user;
-  }
-
-  async findOneByEmail(email: string) {
+  // 유저 1명 조회 (이메일로 조회, authService와 연결)
+  async findUserByEmail(email: string) {
     const user = await this.userRepository.findOneBy({ email });
+    if (!user)
+      throw new NotFoundException('해당 이메일의 회원이 존재하지 않습니다.');
     return user;
+  }
+
+  // 회원 정보 수정
+  async updateUser(
+    confirmPassword: string,
+    newPassword: string,
+    name: string,
+    user,
+  ): Promise<User> {
+    const comparedPassword = await bcrypt.compare(
+      confirmPassword,
+      user.password,
+    );
+    if (!comparedPassword) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+    const newPw = await this.hashPassword(newPassword);
+
+    await this.userRepository.update(
+      { id: user.id },
+      { password: newPw, name },
+    );
+    return this.userRepository.findOne({ where: { id: user.id } });
+  }
+
+  // 회원 탈퇴
+  async deleteUser(confirmPassword: string, user) {
+    const comparedPassword = await bcrypt.compare(
+      confirmPassword,
+      user.password,
+    );
+    if (!comparedPassword) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+    await this.userRepository.softDelete({ id: user.id });
+    return new DeleteUserResDto(user.id);
+  }
+
+  // 비밀번호 해싱
+  async hashPassword(password: string): Promise<string> {
+    const DEFAULT_SALT = 10;
+    return await bcrypt.hash(password, DEFAULT_SALT);
   }
 }

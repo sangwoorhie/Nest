@@ -29,22 +29,28 @@ import {
   ApiGetResponse,
   ApiPostResponse,
 } from 'src/common/decorator/swagger.decorator';
-import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto.';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
-import { UserAfterAuth } from 'src/common/dto/user.dto';
-import { User } from 'src/common/decorator/user.decorator';
+import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
 import { PageReqDto } from 'src/common/dto/req.dto';
 
 @ApiTags('Video')
-@ApiExtraModels(CreateVideoResDto, FindVideoResDto, FindVideoReqDto)
+@ApiExtraModels(
+  CreateVideoReqDto,
+  CreateVideoResDto,
+  FindVideoReqDto,
+  FindVideoResDto,
+)
 @Controller('videos')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
+  // 비디오 생성(업로드)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiPostResponse(CreateVideoResDto)
+  @ApiOperation({ summary: '비디오 업로드' })
   @Post()
   @UseInterceptors(FileInterceptor('video'))
   async create(
@@ -76,8 +82,10 @@ export class VideoController {
     return CreateVideoResDto.toDto(video);
   }
 
+  // 비디오 목록조회
   @ApiBearerAuth()
   @ApiGetItemsResponse(FindVideoResDto)
+  @ApiOperation({ summary: '비디오 목록조회' })
   @Get()
   async findAll(
     @Query() { page, size }: PageReqDto,
@@ -86,7 +94,9 @@ export class VideoController {
     return { items: videos.map((video) => FindVideoResDto.toDto(video)) };
   }
 
+  // 비디오 ID로 찾기
   @ApiBearerAuth()
+  @ApiOperation({ summary: '비디오 상세조회' })
   @ApiGetResponse(FindVideoResDto)
   @Get(':id')
   async findOne(@Param() { id }: FindVideoReqDto) {
@@ -94,7 +104,9 @@ export class VideoController {
     return FindVideoResDto.toDto(video);
   }
 
+  // 비디오 다운로드
   @ApiBearerAuth()
+  @ApiOperation({ summary: '비디오 다운로드' })
   @Get(':id/download')
   async play(
     // @Headers('Sec-Fetch-Dest') setFetchDest: 'document' | 'video',

@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from 'src/common/decorator/public.decorator';
 
+//  JWT 토큰을 사용하여 인증 처리, isPublic일 경우 인증없이 접근가능
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {

@@ -15,16 +15,18 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   // Swagger
+  // http://localhost:3000/docs
   const config = new DocumentBuilder()
     .setTitle('NestJS project')
     .setDescription('NestJS project API description')
     .setVersion('0.1')
-    .addBearerAuth()
+    .addBearerAuth() //jwt인증
     .build();
+
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
       persistAuthorization: true,
-    },
+    }, // 새로고침시 마다 인증이 사라지지않고, 유지되도록함 (AccessToken을 다시 헤더로 전달)
   };
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document, customOptions);
@@ -32,8 +34,7 @@ async function bootstrap() {
   // ValidationPipe 전역 적용
   app.useGlobalPipes(
     new ValidationPipe({
-      // class-transformer 적용
-      transform: true,
+      transform: true, // class-transformer 적용
     }),
   );
 

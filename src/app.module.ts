@@ -6,7 +6,7 @@ import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/jwt/jwt-auth.guard';
 import postgresConfig from './config/postgres.config';
 import jwtConfig from './config/jwt.config';
 

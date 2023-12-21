@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -10,35 +19,80 @@ import {
   ApiGetItemsResponse,
   ApiGetResponse,
 } from 'src/common/decorator/swagger.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { FindUserResDto } from './dto/res.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import {
+  DeleteUserResDto,
+  EditUserResDto,
+  FindUserResDto,
+} from './dto/res.dto';
 import { PageReqDto } from 'src/common/dto/req.dto';
-import { FindUserReqDto } from './dto/req.dto';
 import { PageResDto } from 'src/common/dto/res.dto';
+import { DeleteUserReqDto, EditUserReqDto } from './dto/req.dto';
+import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
 
 @ApiTags('User')
-@ApiExtraModels(FindUserResDto, PageResDto, PageReqDto, FindUserReqDto)
+@ApiExtraModels(FindUserResDto, PageReqDto, PageResDto)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // 유저 목록조회
   @ApiBearerAuth()
   @ApiGetItemsResponse(FindUserResDto)
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '유저 목록조회' })
   @Get()
   async findAll(
     @Query() { page, size }: PageReqDto,
+    @User() user: UserAfterAuth,
   ): Promise<{ items: FindUserResDto[] }> {
     const users = await this.userService.findAll(page, size);
     return { items: users.map((user) => FindUserResDto.toDto(user)) };
   }
 
+  // 유저 1명 조회 (이메일로 조회)
   @ApiBearerAuth()
   @ApiGetResponse(FindUserResDto)
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findOne(@Param() { id }: FindUserReqDto): Promise<FindUserResDto> {
-    const user = await this.userService.findOne(id);
+  @ApiOperation({ summary: 'E-mail 유저조회' })
+  @Get('/:email')
+  async findUserByEmail(
+    @Query('email') email: string,
+  ): Promise<FindUserResDto> {
+    const user = await this.userService.findUserByEmail(email);
     return FindUserResDto.toDto(user);
+  }
+
+  // 회원 정보 수정
+  @ApiBearerAuth()
+  @ApiGetResponse(EditUserResDto)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '회원정보 수정' })
+  @Patch()
+  async updateUser(
+    @Body() { confirmPassword, newPassword, name }: EditUserReqDto,
+    @User() user: UserAfterAuth,
+  ): Promise<EditUserResDto> {
+    const updatedUser = await this.userService.updateUser(
+      confirmPassword,
+      newPassword,
+      name,
+      user,
+    );
+    return EditUserResDto.toDto(updatedUser);
+  }
+
+  // 회원 탈퇴
+  @ApiBearerAuth()
+  @ApiGetResponse(DeleteUserResDto)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '회원탈퇴' })
+  @Delete()
+  async deleteUser(
+    @Body() { confirmPassword }: DeleteUserReqDto,
+    @User() user: UserAfterAuth,
+  ): Promise<DeleteUserResDto> {
+    await this.userService.deleteUser(confirmPassword, user);
+    return new DeleteUserResDto(user.id);
   }
 }

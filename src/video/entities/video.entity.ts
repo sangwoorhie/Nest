@@ -23,10 +23,10 @@ export class Video {
   @Column({ name: 'download_cnt', default: 0 })
   downloadCnt: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.videos)

@@ -20,13 +20,16 @@ export class User {
   @Column()
   password: string;
 
+  @Column()
+  name: string;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.Normal })
   role: UserRole;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   @OneToMany(() => Video, (video) => video.user)
