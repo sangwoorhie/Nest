@@ -34,13 +34,13 @@ export class AuthController {
   async signup(
     @Body() { email, password, confirmPassword, name }: SignupReqDto,
   ): Promise<SignupResDto> {
-    const { id } = await this.authService.signup(
+    const { id, accessToken, refreshToken } = await this.authService.signup(
       email,
       password,
       confirmPassword,
       name,
     );
-    return { id };
+    return { id, accessToken, refreshToken };
   }
 
   // 로그인

@@ -30,13 +30,22 @@ export class AuthService {
       throw new BadRequestException(
         '비밀번호와 확인 비밀번호가 일치하지 않습니다.',
       );
+
+    // 동일이메일 존재유무 확인
     const user = await this.userService.findUserByEmail(email);
     if (user) throw new BadRequestException('이미 존재하는 이메일입니다.');
     const saltOrRounds = 10;
+
     // 비밀번호 해싱후 저장
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
     const newUser = await this.userService.signup(email, hashedPassword, name);
-    return newUser;
+
+    // 액세스, 리프레시 토큰 발급 후 저장,반환
+    const accessToken = this.generateAccessToken(newUser.id);
+    const refreshToken = this.generateRefreshToken(newUser.id);
+    await this.createRefreshTokenUsingUser(newUser.id, refreshToken);
+
+    return { id: newUser.id, accessToken, refreshToken };
   }
 
   // 2. 로그인
@@ -69,7 +78,7 @@ export class AuthService {
     return this.jwtService.sign(payload, { expiresIn: '7d' });
   }
 
-  // 리프레시토큰 영속성 유지
+  // 리프레시토큰 영속성 유지 (리프래시토큰 있으면 갱신, 없으면 새로운 엔티티 생성 저장)
   private async createRefreshTokenUsingUser(
     userId: string,
     refreshToken: string,
@@ -78,7 +87,7 @@ export class AuthService {
       user: { id: userId },
     });
 
-    // 이미 리프레시토큰을 발급받은 경우 / 그렇지 않은경우
+    // if 이미 리프레시토큰을 발급받은 경우 / else 그렇지 않은경우
     if (refreshTokenEntity) {
       refreshTokenEntity.token = refreshToken;
     } else {

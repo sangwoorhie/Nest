@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
@@ -34,11 +34,11 @@ import { RefreshToken } from './entities/refreshToken.entity';
   providers: [
     AuthService,
     JwtStrategy,
-    JwtAuthGuard,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    Logger,
   ],
   controllers: [AuthController],
   exports: [AuthService],

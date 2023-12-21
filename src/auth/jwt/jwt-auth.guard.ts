@@ -2,7 +2,10 @@ import { UserService } from 'src/user/user.service';
 import {
   ExecutionContext,
   Injectable,
+  Logger,
+  LoggerService,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +16,7 @@ import { IS_PUBLIC_KEY } from 'src/common/decorator/public.decorator';
 import { ROLES_KEY } from 'src/common/decorator/role.decorator';
 import { UserRole } from 'src/user/enum/user.enum';
 
+// Guard단에서는 인증(Authentication), 인가(Authorization)을 주로 처리
 //  JWT 토큰을 사용하여 인증 처리, isPublic일 경우 인증과정 없이 접근가능
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -20,6 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     private reflector: Reflector,
     private jwtService: JwtService,
     private userService: UserService,
+    @Inject(Logger) private logger: LoggerService,
   ) {
     super();
   }
@@ -46,8 +51,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       url !== '/api/auth/refresh' &&
       decodedToken['tokenType'] === 'refresh'
     ) {
-      console.error('accessToken이 필요합니다.');
-      throw new UnauthorizedException();
+      const error = new UnauthorizedException('accessToken이 필요합니다.');
+      this.logger.error(error.message, error.stack);
+      throw error;
     }
 
     // 메타데이터로 읽어온 유저권한 (관리자만 가능하도록 권한부여)

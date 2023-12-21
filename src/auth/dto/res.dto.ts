@@ -4,6 +4,12 @@ import { ApiProperty } from '@nestjs/swagger';
 export class SignupResDto {
   @ApiProperty({ required: true })
   id: string;
+
+  @ApiProperty({ required: true })
+  accessToken: string;
+
+  @ApiProperty({ required: true })
+  refreshToken: string;
 }
 
 // 로그인 응답 DTO
@@ -15,6 +21,7 @@ export class SigninResDto {
   refreshToken: string;
 }
 
+// 리프레시토큰 응답 DTO
 export class RefreshResDto {
   @ApiProperty({ required: true })
   accessToken: string;
