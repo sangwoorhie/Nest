@@ -34,6 +34,7 @@ import { RefreshToken } from './entities/refreshToken.entity';
   providers: [
     AuthService,
     JwtStrategy,
+    JwtAuthGuard,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

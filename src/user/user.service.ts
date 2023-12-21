@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { DeleteUserResDto } from './dto/res.dto';
+import { UserRole } from './enum/user.enum';
 
 @Injectable()
 export class UserService {
@@ -73,6 +74,12 @@ export class UserService {
     }
     await this.userRepository.softDelete({ id: user.id });
     return new DeleteUserResDto(user.id);
+  }
+
+  // 관리자 조회 (jwt-auth.Guard와 연결)
+  async checkUserIsAdmin(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    return user.role === UserRole.Admin;
   }
 
   // 비밀번호 해싱

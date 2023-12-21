@@ -29,6 +29,8 @@ import { PageReqDto } from 'src/common/dto/req.dto';
 import { PageResDto } from 'src/common/dto/res.dto';
 import { DeleteUserReqDto, EditUserReqDto } from './dto/req.dto';
 import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
+import { Roles } from 'src/common/decorator/role.decorator';
+import { UserRole } from './enum/user.enum';
 
 @ApiTags('User')
 @ApiExtraModels(FindUserResDto, PageReqDto, PageResDto)
@@ -39,6 +41,7 @@ export class UserController {
   // 유저 목록조회
   @ApiBearerAuth()
   @ApiGetItemsResponse(FindUserResDto)
+  @Roles(UserRole.Admin) // 관리자만 조회가능
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저 목록조회' })
   @Get()
