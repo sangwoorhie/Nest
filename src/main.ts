@@ -37,10 +37,10 @@ async function bootstrap() {
     }),
   );
 
-  const port = 3000;
-  await app.listen(port);
+  const PORT = 3000;
+  await app.listen(PORT);
   console.info(`NODE_ENV: ${configService.get('NODE_ENV')}`);
-  console.info(`listening on port ${port}`);
+  console.info(`listening on port ${PORT}`);
 }
 bootstrap();
 

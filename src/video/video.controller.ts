@@ -29,7 +29,7 @@ import {
   ApiGetResponse,
   ApiPostResponse,
 } from 'src/common/decorator/swagger.decorator';
-import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto';
+import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto.';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
 import { UserAfterAuth } from 'src/common/dto/user.dto';

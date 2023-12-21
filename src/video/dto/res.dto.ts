@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Video } from '../entity/video.entity';
+import { Video } from '../entities/video.entity';
 
 export class CreateVideoResDto {
   @ApiProperty({ required: true })
