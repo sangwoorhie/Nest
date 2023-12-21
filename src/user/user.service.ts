@@ -57,7 +57,7 @@ export class UserService {
   }
 
   // 회원 탈퇴
-  async deleteUser(confirmPassword: string, user) {
+  async deleteUser(confirmPassword: string, user): Promise<any> {
     const comparedPassword = await bcrypt.compare(
       confirmPassword,
       user.password,
@@ -77,7 +77,7 @@ export class UserService {
 
   // 비밀번호 해싱
   async hashPassword(password: string): Promise<string> {
-    const saltOrRounds = process.env.BCRYPT_SALT;
-    return await bcrypt.hash(password, saltOrRounds);
+    const saltRounds = process.env.BCRYPT_SALT;
+    return await bcrypt.hash(password, saltRounds);
   }
 }

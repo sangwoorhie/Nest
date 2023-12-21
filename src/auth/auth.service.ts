@@ -75,13 +75,7 @@ export class AuthService {
 
   // 2. 로그인
   async signin(email: string, password: string) {
-    const user = await this.userService.findUserByEmail(email);
-    if (!user)
-      throw new UnauthorizedException('해당 회원이 존재하지 않습니다.');
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException('잘못된 비밀번호입니다.');
-
+    const user = await this.validateUser(email, password);
     const refreshToken = await this.generateRefreshToken(user.id);
     await this.createRefreshTokenUsingUser(user.id, refreshToken);
 
@@ -89,6 +83,18 @@ export class AuthService {
       accessToken: this.generateAccessToken(user.id),
       refreshToken,
     };
+  }
+
+  // 유저 유효성 검사
+  private async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user)
+      throw new UnauthorizedException('해당 회원이 존재하지 않습니다.');
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new UnauthorizedException('잘못된 비밀번호입니다.');
+
+    return user;
   }
 
   // 엑세스토큰 발급
@@ -132,7 +138,7 @@ export class AuthService {
     if (refreshTokenEntity) throw new BadRequestException();
     const accessToken = this.generateAccessToken(userId);
     const refreshToken = this.generateRefreshToken(userId);
-    // 리프레시토큰 영속성 유지
+    // 리프레시토큰 DB저장
     refreshTokenEntity.token = refreshToken;
     await this.refreshTokenRepository.save(refreshTokenEntity);
     return { accessToken, refreshToken };

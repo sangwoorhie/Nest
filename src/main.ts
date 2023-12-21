@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 import { WinstonModule, utilities } from 'nest-winston';
 import * as winston from 'winston';
 import { TransformInterceptor } from './common/interceptor/transform-interceptor';
+import * as basicAuth from 'express-basic-auth';
 
 async function bootstrap() {
   // Winston 로거 : 'prod' 환경이 아닌 경우 로그 레벨을 'debug'로 설정하고, 'prod' 환경에서는 'info'로 설정
@@ -29,23 +30,38 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
+  const stage = configService.get('NODE_ENV');
   app.setGlobalPrefix('api/v1');
 
   // Swagger : http://localhost:3000/docs
-  const config = new DocumentBuilder()
-    .setTitle('NestJS project')
-    .setDescription('NestJS project API description')
-    .setVersion('0.1')
-    .addBearerAuth() //jwt인증
-    .build();
+  // 스웨거가 로컬 or 개발(dev)환경이라는 전제 하에만 작동, 프로덕션 환경에서는 노출X
+  const SWAGGER_ENVS = ['local', 'development']; // ex) run start:dev : NODE_ENV=development
+  if (SWAGGER_ENVS.includes(stage)) {
+    app.use(
+      ['/docs', '/docs-json'], // 접근경로
+      basicAuth({
+        challenge: true,
+        users: {
+          [configService.get('swagger.user')]:
+            configService.get('swagger.password'), // 환경변수 유저인증
+        },
+      }),
+    );
+    const config = new DocumentBuilder()
+      .setTitle('NestJS project')
+      .setDescription('NestJS project API description')
+      .setVersion('0.1')
+      .addBearerAuth() //jwt인증
+      .build();
 
-  const customOptions: SwaggerCustomOptions = {
-    swaggerOptions: {
-      persistAuthorization: true,
-    }, // 새로고침시 마다 인증이 사라지지않고, 유지되도록함 (AccessToken을 다시 헤더로 전달)
-  };
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, customOptions);
+    const customOptions: SwaggerCustomOptions = {
+      swaggerOptions: {
+        persistAuthorization: true,
+      }, // 새로고침시 마다 인증이 사라지지않고, 유지되도록함 (AccessToken을 다시 헤더로 전달)
+    };
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document, customOptions);
+  }
 
   // ValidationPipe 전역 적용
   app.useGlobalPipes(
