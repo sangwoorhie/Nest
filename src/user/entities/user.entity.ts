@@ -6,8 +6,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { UserRole } from '../enum/user.enum';
+import { RefreshToken } from 'src/auth/entities/refreshToken.entity';
 
 @Entity()
 export class User {
@@ -34,4 +36,7 @@ export class User {
 
   @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
+
+  @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshToken: RefreshToken;
 }
