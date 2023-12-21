@@ -16,13 +16,6 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  // 회원가입 (authService와 연결)
-  async signup(email: string, password: string, name: string): Promise<User> {
-    const user = this.userRepository.create({ email, password, name });
-    await this.userRepository.save(user);
-    return user;
-  }
-
   // 유저 목록조회
   async findAll(page: number, size: number) {
     const users = this.userRepository.find({
@@ -84,7 +77,7 @@ export class UserService {
 
   // 비밀번호 해싱
   async hashPassword(password: string): Promise<string> {
-    const DEFAULT_SALT = 10;
-    return await bcrypt.hash(password, DEFAULT_SALT);
+    const saltOrRounds = process.env.BCRYPT_SALT;
+    return await bcrypt.hash(password, saltOrRounds);
   }
 }

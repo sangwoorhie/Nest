@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToOne,
+  Index,
 } from 'typeorm';
 import { UserRole } from '../enum/user.enum';
 import { RefreshToken } from 'src/auth/entities/refreshToken.entity';
@@ -16,6 +17,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index('user-Email-idx')
   @Column({ unique: true })
   email: string;
 
