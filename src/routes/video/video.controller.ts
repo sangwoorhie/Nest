@@ -30,12 +30,14 @@ import {
   ApiPostResponse,
 } from 'src/common/decorator/swagger.decorator';
 import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
 import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
 import { PageReqDto } from 'src/common/dto/req.dto';
 import { ThrottlerBehindProxyGuard } from 'src/common/guard/throttler-behind-proxy.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { CreateVideoCommand } from './command/create-video.command';
+import { CommandBus } from '@nestjs/cqrs';
 
 @ApiTags('Video')
 @ApiExtraModels(
@@ -47,7 +49,10 @@ import { SkipThrottle, Throttle } from '@nestjs/throttler';
 @UseGuards(ThrottlerBehindProxyGuard) // Throttler가드 전역 적용
 @Controller('videos')
 export class VideoController {
-  constructor(private readonly videoService: VideoService) {}
+  constructor(
+    private readonly videoService: VideoService,
+    private commandBus: CommandBus,
+  ) {}
 
   // 비디오 생성(업로드)
   @ApiBearerAuth()
@@ -55,35 +60,51 @@ export class VideoController {
   @ApiPostResponse(CreateVideoResDto)
   @ApiOperation({ summary: '비디오 업로드' })
   @Post()
-  @UseInterceptors(FileInterceptor('video'))
-  async create(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: 'mp4',
-        })
-        .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024,
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        }),
-    )
-    file: Express.Multer.File,
-    @Body() { title }: CreateVideoReqDto,
-    @User() { id }: UserAfterAuth,
+  async upload(
+    @Body() createVideoReqDto: CreateVideoReqDto,
+    @User() user: UserAfterAuth,
   ): Promise<CreateVideoResDto> {
-    const { mimetype, originalname, buffer } = file;
-    const extension = originalname.split('.')[1];
-    const video = await this.videoService.create(
-      id,
+    const { title, video } = createVideoReqDto;
+    const command = new CreateVideoCommand(
+      user.id,
       title,
-      mimetype,
-      extension,
-      buffer,
+      'video/mp4',
+      'mp4',
+      Buffer.from(''),
     );
-    return CreateVideoResDto.toDto(video);
+    const { id } = await this.commandBus.execute(command); // command 실행, createVideoHandler에서 반환된 video의 id
+    return { id, title };
   }
+
+  // @UseInterceptors(FileInterceptor('video'))
+  // async create(
+  //   @UploadedFile(
+  //     new ParseFilePipeBuilder()
+  //       .addFileTypeValidator({
+  //         fileType: 'mp4',
+  //       })
+  //       .addMaxSizeValidator({
+  //         maxSize: 5 * 1024 * 1024,
+  //       })
+  //       .build({
+  //         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+  //       }),
+  //   )
+  //   file: Express.Multer.File,
+  //   @Body() { title }: CreateVideoReqDto,
+  //   @User() { id }: UserAfterAuth,
+  // ): Promise<CreateVideoResDto> {
+  //   const { mimetype, originalname, buffer } = file;
+  //   const extension = originalname.split('.')[1];
+  //   const video = await this.videoService.create(
+  //     id,
+  //     title,
+  //     mimetype,
+  //     extension,
+  //     buffer,
+  //   );
+  //   return CreateVideoResDto.toDto(video);
+  // }
 
   // 비디오 목록조회
   @ApiBearerAuth()

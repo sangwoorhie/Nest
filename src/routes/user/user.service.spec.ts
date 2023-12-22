@@ -1,7 +1,7 @@
 import { IsEmail } from 'class-validator';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserService } from 'src/user/user.service';
+import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 
 // Jest를 활용한 UserService 단위테스트 : npm run test

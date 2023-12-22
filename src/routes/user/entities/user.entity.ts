@@ -1,4 +1,4 @@
-import { Video } from 'src/video/entities/video.entity';
+import { Video } from 'src/routes/video/entities/video.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
   Index,
 } from 'typeorm';
 import { UserRole } from '../enum/user.enum';
-import { RefreshToken } from 'src/auth/entities/refreshToken.entity';
+import { RefreshToken } from 'src/routes/auth/entities/refreshToken.entity';
 
 @Entity()
 export class User {

@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), JwtModule],

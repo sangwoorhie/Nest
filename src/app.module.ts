@@ -2,14 +2,15 @@ import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { UserModule } from './user/user.module';
-import { VideoModule } from './video/video.module';
-import { AuthModule } from './auth/auth.module';
+import { UserModule } from './routes/user/user.module';
+import { VideoModule } from './routes/video/video.module';
+import { AuthModule } from './routes/auth/auth.module';
 import postgresConfig from './config/postgres.config';
 import jwtConfig from './config/jwt.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import swaggerConfig from './config/swagger.config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { HealthModule } from './routes/health/health.module';
 import sentryConfig from './config/sentry.config';
 
 @Module({
@@ -55,6 +56,7 @@ import sentryConfig from './config/sentry.config';
     UserModule,
     VideoModule,
     AnalyticsModule,
+    HealthModule,
   ],
   providers: [Logger],
 })

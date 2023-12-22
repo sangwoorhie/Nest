@@ -1,4 +1,4 @@
-import { UserService } from 'src/user/user.service';
+import { UserService } from './../../user/user.service';
 import {
   ExecutionContext,
   Injectable,
@@ -14,7 +14,7 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { IS_PUBLIC_KEY } from 'src/common/decorator/public.decorator';
 import { ROLES_KEY } from 'src/common/decorator/role.decorator';
-import { UserRole } from 'src/user/enum/user.enum';
+import { UserRole } from 'src/routes/user/enum/user.enum';
 
 // Guard단에서는 인증(Authentication), 인가(Authorization)을 주로 처리
 //  JWT 토큰을 사용하여 인증 처리, isPublic일 경우 인증과정 없이 접근가능

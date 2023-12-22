@@ -19,7 +19,7 @@ import {
   ApiGetItemsResponse,
   ApiGetResponse,
 } from 'src/common/decorator/swagger.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   DeleteUserResDto,
   EditUserResDto,
