@@ -37,7 +37,8 @@ import { PageReqDto } from 'src/common/dto/req.dto';
 import { ThrottlerBehindProxyGuard } from 'src/common/guard/throttler-behind-proxy.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { CreateVideoCommand } from './command/create-video.command';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { FindVideosQuery } from './query/find.videos.query';
 
 @ApiTags('Video')
 @ApiExtraModels(
@@ -52,6 +53,7 @@ export class VideoController {
   constructor(
     private readonly videoService: VideoService,
     private commandBus: CommandBus,
+    private queryBus: QueryBus,
   ) {}
 
   // 비디오 생성(업로드)
@@ -72,7 +74,8 @@ export class VideoController {
       'mp4',
       Buffer.from(''),
     );
-    const { id } = await this.commandBus.execute(command); // command 실행, createVideoHandler에서 반환된 video의 id
+    // commandBus 실행, createVideoHandler에서 반환된 video의 id
+    const { id } = await this.commandBus.execute(command);
     return { id, title };
   }
 
@@ -108,16 +111,39 @@ export class VideoController {
 
   // 비디오 목록조회
   @ApiBearerAuth()
-  @SkipThrottle() // ThrottlerBehindProxyGuard 적용 안받음.
   @ApiGetItemsResponse(FindVideoResDto)
+  @SkipThrottle() // ThrottlerBehindProxyGuard 적용 안받음.
   @ApiOperation({ summary: '비디오 목록조회' })
   @Get()
   async findAll(
     @Query() { page, size }: PageReqDto,
-  ): Promise<{ items: FindVideoResDto[] }> {
-    const videos = await this.videoService.findAll(page, size);
-    return { items: videos.map((video) => FindVideoResDto.toDto(video)) };
+  ): Promise<FindVideoResDto[]> {
+    const findVidesoQuery = new FindVideosQuery(page, size);
+    // queryBus 실행, findVideo 쿼리실행
+    const videos = await this.queryBus.execute(findVidesoQuery);
+    return videos.map(({ id, title, user }) => {
+      return {
+        id,
+        title,
+        user: {
+          id: user.id,
+          email: user.email,
+        },
+      };
+    });
   }
+
+  // @ApiBearerAuth()
+  // @SkipThrottle() // ThrottlerBehindProxyGuard 적용 안받음.
+  // @ApiGetItemsResponse(FindVideoResDto)
+  // @ApiOperation({ summary: '비디오 목록조회' })
+  // @Get()
+  // async findAll(
+  //   @Query() { page, size }: PageReqDto,
+  // ): Promise<{ items: FindVideoResDto[] }> {
+  //   const videos = await this.videoService.findAll(page, size);
+  //   return { items: videos.map((video) => FindVideoResDto.toDto(video)) };
+  // }
 
   // 비디오 ID로 찾기
   @ApiBearerAuth()

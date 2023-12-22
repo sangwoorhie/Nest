@@ -6,7 +6,9 @@ import { VideoService } from './video.service';
 import { Video } from './entities/video.entity';
 import { User } from '../user/entities/user.entity';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CreateVideoHandler } from './create-video.handler';
+import { CreateVideoHandler } from './handler/create-video.handler';
+import { VideoCreatedHandler } from './handler/video-created.handler';
+import { FindVideosQueryHandler } from './handler/find-videos.handler';
 
 @Module({
   imports: [
@@ -15,6 +17,11 @@ import { CreateVideoHandler } from './create-video.handler';
     CqrsModule,
   ],
   controllers: [VideoController],
-  providers: [VideoService, CreateVideoHandler],
+  providers: [
+    VideoService,
+    CreateVideoHandler,
+    VideoCreatedHandler,
+    FindVideosQueryHandler,
+  ],
 })
 export class VideoModule {}

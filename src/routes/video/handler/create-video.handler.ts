@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateVideoCommand } from './command/create-video.command';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CreateVideoCommand } from '../command/create-video.command';
 import { DataSource } from 'typeorm';
-import { Video } from './entities/video.entity';
-import { User } from '../user/entities/user.entity';
+import { Video } from '../entities/video.entity';
+import { User } from '../../user/entities/user.entity';
+import { VideoCreatedEvent } from '../event/video-created.event';
 
 // Nest.js CQRS 패턴을 사용해 구현한 비디오 생성 핸들러 CreateVideoHandler
 @Injectable()
 @CommandHandler(CreateVideoCommand)
 export class CreateVideoHandler implements ICommandHandler<CreateVideoCommand> {
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private dataSource: DataSource,
+    private eventBus: EventBus,
+  ) {}
 
   async execute(command: CreateVideoCommand): Promise<Video> {
     const { userId, title, mimetype, extension, buffer } = command;
@@ -24,6 +28,7 @@ export class CreateVideoHandler implements ICommandHandler<CreateVideoCommand> {
       );
       await this.uploadVideo(video.id, extension, buffer);
       await queryRunner.commitTransaction();
+      this.eventBus.publish(new VideoCreatedEvent(video.id)); // eventBus를 활용하여 이벤트를 퍼블리싱
       return video; // video 반환
     } catch (err) {
       await queryRunner.rollbackTransaction();
