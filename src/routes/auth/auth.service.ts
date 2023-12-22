@@ -10,6 +10,7 @@ import { RefreshToken } from './entities/refreshToken.entity';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
+import { LogoutResDto } from './dto/res.dto';
 
 @Injectable()
 export class AuthService {
@@ -142,5 +143,18 @@ export class AuthService {
     refreshTokenEntity.token = refreshToken;
     await this.refreshTokenRepository.save(refreshTokenEntity);
     return { accessToken, refreshToken };
+  }
+
+  // 4. 로그아웃
+  async logout(token: string, userId: string) {
+    const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({
+      token,
+      user: { id: userId },
+    });
+    if (!refreshTokenEntity) {
+      throw new BadRequestException('이미 로그아웃 되었습니다.');
+    }
+    await this.refreshTokenRepository.delete(refreshTokenEntity.id);
+    return new LogoutResDto(userId);
   }
 }

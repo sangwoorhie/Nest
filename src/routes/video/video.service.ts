@@ -34,7 +34,7 @@ export class VideoService {
 
     await this.videoRepository.update(
       { id },
-      { downloadCount: () => 'downloadcount + 1' }, // 비디오 다운로드카운드 증가
+      { downloadCount: () => 'downloadcount + 1' }, // 비디오 다운로드 카운드 증가
     );
 
     const { mimetype } = video;
