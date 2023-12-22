@@ -34,6 +34,8 @@ import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
 import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
 import { PageReqDto } from 'src/common/dto/req.dto';
+import { ThrottlerBehindProxyGuard } from 'src/common/guard/throttler-behind-proxy.guard';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @ApiTags('Video')
 @ApiExtraModels(
@@ -42,6 +44,7 @@ import { PageReqDto } from 'src/common/dto/req.dto';
   FindVideoReqDto,
   FindVideoResDto,
 )
+@UseGuards(ThrottlerBehindProxyGuard) // Throttler가드 전역 적용
 @Controller('videos')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
@@ -84,6 +87,7 @@ export class VideoController {
 
   // 비디오 목록조회
   @ApiBearerAuth()
+  @SkipThrottle() // ThrottlerBehindProxyGuard 적용 안받음.
   @ApiGetItemsResponse(FindVideoResDto)
   @ApiOperation({ summary: '비디오 목록조회' })
   @Get()
@@ -106,6 +110,7 @@ export class VideoController {
 
   // 비디오 다운로드
   @ApiBearerAuth()
+  // @Throttle(3, 60) // 60초동안 3번만 다운가능하도록 허용
   @ApiOperation({ summary: '비디오 다운로드' })
   @Get(':id/download')
   async play(

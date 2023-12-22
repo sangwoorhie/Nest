@@ -5,15 +5,20 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt/jwt-auth.guard';
 import postgresConfig from './config/postgres.config';
 import jwtConfig from './config/jwt.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import swaggerConfig from './config/swagger.config';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60, // 유효시간(초단위) 제한
+        limit: 10, // 해당 유효시간동안 요청횟수 제한 (60초동안 10번 제한)
+      },
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [postgresConfig, jwtConfig, swaggerConfig],
