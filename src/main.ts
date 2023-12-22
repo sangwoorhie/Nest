@@ -9,8 +9,10 @@ import {
 import { AppModule } from './app.module';
 import { WinstonModule, utilities } from 'nest-winston';
 import * as winston from 'winston';
-import { TransformInterceptor } from './common/interceptor/transform-interceptor';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import * as basicAuth from 'express-basic-auth';
+import { SentryInterceptor } from './common/interceptor/sentry.interceptor';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
   // Winston 로거 : 'prod' 환경이 아닌 경우 로그 레벨을 'debug'로 설정하고, 'prod' 환경에서는 'info'로 설정
@@ -70,8 +72,15 @@ async function bootstrap() {
     }),
   );
 
+  // Sentry SDK 초기화
+  Sentry.init({ dsn: configService.get('sentry.dsn') });
+
   // 페이지네이션을 위한 TransformInterceptor 전역 적용
-  app.useGlobalInterceptors(new TransformInterceptor());
+  // 에러발생시 슬랙알람을 위한 SentryInterceptor 전역 적용
+  app.useGlobalInterceptors(
+    new SentryInterceptor(),
+    new TransformInterceptor(),
+  );
 
   const PORT = 3000;
   await app.listen(PORT);
