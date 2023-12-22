@@ -15,74 +15,72 @@ export class VideoService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async create(
-    userId: string,
-    title: string,
-    mimetype: string,
-    extension: string,
-    buffer: Buffer,
-  ): Promise<Video> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.startTransaction();
-    try {
-      const user = await this.userRepository.findOneBy({ id: userId });
-      const video = await this.videoRepository.save(
-        this.videoRepository.create({ title, mimetype, user }),
-      );
-      await this.uploadVideo(video.id, extension, buffer);
-      await queryRunner.commitTransaction();
-      return video;
-    } catch (err) {
-      console.error(err);
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  async findAll(page: number, size: number) {
-    const videos = await this.videoRepository.find({
-      relations: ['user'],
-      skip: (page - 1) * size,
-      take: size,
-    });
-    return videos;
-  }
-
+  // 비디오 ID로 찾기
   async findOne(id: string) {
     const video = await this.videoRepository.findOne({
       relations: ['user'],
       where: { id },
     });
-    if (!video) throw new NotFoundException('No video');
+    if (!video) throw new NotFoundException('비디오가 존재하지 않습니다.');
     return video;
   }
 
+  // 비디오 다운로드
   async download(
     id: string,
   ): Promise<{ stream: ReadStream; mimetype: string; size: number }> {
     const video = await this.videoRepository.findOneBy({ id });
-    if (!video) throw new NotFoundException('No video');
+    if (!video) throw new NotFoundException('비디오가 존재하지 않습니다.');
 
     await this.videoRepository.update(
       { id },
-      { downloadCnt: () => 'download_cnt + 1' },
+      { downloadCount: () => 'downloadcount + 1' }, // 비디오 다운로드카운드 증가
     );
 
     const { mimetype } = video;
-    const extension = mimetype.split('/')[1];
+    const extension = mimetype.split('/')[1]; // 비디오 확장자
     const videoPath = join(
+      // 비디오 저장위치 경로
       process.cwd(),
       'video-storage',
       `${id}.${extension}`,
     );
     const { size } = await stat(videoPath);
-    const stream = createReadStream(videoPath);
+    const stream = createReadStream(videoPath); // 파일 읽기
     return { stream, mimetype, size };
   }
 
-  private async uploadVideo(id: string, extension: string, buffer: Buffer) {
-    const filePath = join(process.cwd(), 'video-storage', `${id}.${extension}`);
-    await writeFile(filePath, buffer);
-  }
+  // async create(
+  //   userId: string,
+  //   title: string,
+  //   mimetype: string,
+  //   extension: string,
+  //   buffer: Buffer,
+  // ): Promise<Video> {
+  //   const queryRunner = this.dataSource.createQueryRunner();
+  //   await queryRunner.startTransaction();
+  //   try {
+  //     const user = await this.userRepository.findOneBy({ id: userId });
+  //     const video = await this.videoRepository.save(
+  //       this.videoRepository.create({ title, mimetype, user }),
+  //     );
+  //     await this.uploadVideo(video.id, extension, buffer);
+  //     await queryRunner.commitTransaction();
+  //     return video;
+  //   } catch (err) {
+  //     console.error(err);
+  //     await queryRunner.rollbackTransaction();
+  //   } finally {
+  //     await queryRunner.release();
+  //   }
+  // }
+
+  // async findAll(page: number, size: number) {
+  //   const videos = await this.videoRepository.find({
+  //     relations: ['user'],
+  //     skip: (page - 1) * size,
+  //     take: size,
+  //   });
+  //   return videos;
+  // }
 }

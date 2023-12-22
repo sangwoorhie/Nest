@@ -20,16 +20,16 @@ export class Video {
   @Column()
   mimetype: string;
 
-  @Column({ name: 'download_cnt', default: 0 })
-  downloadCnt: number;
+  @Column({ name: 'downloadCount', default: 0 })
+  downloadCount: number;
 
-  @CreateDateColumn({ name: 'createdat' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedat' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.videos)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

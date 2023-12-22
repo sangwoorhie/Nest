@@ -5,6 +5,8 @@ import { DataSource } from 'typeorm';
 import { Video } from '../entities/video.entity';
 import { User } from '../../user/entities/user.entity';
 import { VideoCreatedEvent } from '../event/video-created.event';
+import { join } from 'path';
+import { writeFile } from 'fs/promises';
 
 // Nest.js CQRS 패턴을 사용해 구현한 비디오 생성 핸들러 CreateVideoHandler
 @Injectable()
@@ -23,8 +25,9 @@ export class CreateVideoHandler implements ICommandHandler<CreateVideoCommand> {
 
     try {
       const user = await queryRunner.manager.findOneBy(User, { id: userId });
+      // DB에 비디오 메타데이터 저장
       const video = await queryRunner.manager.save(
-        queryRunner.manager.create(Video, { title, mimetype }),
+        queryRunner.manager.create(Video, { title, mimetype, user }),
       );
       await this.uploadVideo(video.id, extension, buffer);
       await queryRunner.commitTransaction();
@@ -39,7 +42,9 @@ export class CreateVideoHandler implements ICommandHandler<CreateVideoCommand> {
     }
   }
 
+  // 실제 비디오가 저장될 경로
   private async uploadVideo(id: string, extension: string, buffer: Buffer) {
-    console.log('upload video');
+    const filePath = join(process.cwd(), 'video-storage', `${id}.${extension}`);
+    await writeFile(filePath, buffer);
   }
 }

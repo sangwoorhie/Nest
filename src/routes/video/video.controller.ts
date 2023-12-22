@@ -59,55 +59,43 @@ export class VideoController {
   // 비디오 생성(업로드)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('video')) // 업로드 될 필드명
   @ApiPostResponse(CreateVideoResDto)
   @ApiOperation({ summary: '비디오 업로드' })
   @Post()
   async upload(
-    @Body() createVideoReqDto: CreateVideoReqDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'mp4',
+        })
+        .addMaxSizeValidator({
+          maxSize: 5 * 1024 * 1024, // 5 Megabyte
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY, // validation 통과못했을 때 에러
+        }),
+    )
+    file: Express.Multer.File,
+    @Body()
+    createVideoReqDto: CreateVideoReqDto,
     @User() user: UserAfterAuth,
   ): Promise<CreateVideoResDto> {
+    const { mimetype, originalname, buffer } = file; // file 디스트럭쳐링(구조분해할당)
+    const extension = originalname.split('.')[1]; // array의 1번째인덱스 = 비디오파일 확장자
     const { title, video } = createVideoReqDto;
     const command = new CreateVideoCommand(
       user.id,
       title,
-      'video/mp4',
-      'mp4',
-      Buffer.from(''),
+      mimetype,
+      extension,
+      buffer,
     );
     // commandBus 실행, createVideoHandler에서 반환된 video의 id
     const { id } = await this.commandBus.execute(command);
     return { id, title };
+    // return CreateVideoResDto.toDto(video);
   }
-
-  // @UseInterceptors(FileInterceptor('video'))
-  // async create(
-  //   @UploadedFile(
-  //     new ParseFilePipeBuilder()
-  //       .addFileTypeValidator({
-  //         fileType: 'mp4',
-  //       })
-  //       .addMaxSizeValidator({
-  //         maxSize: 5 * 1024 * 1024,
-  //       })
-  //       .build({
-  //         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-  //       }),
-  //   )
-  //   file: Express.Multer.File,
-  //   @Body() { title }: CreateVideoReqDto,
-  //   @User() { id }: UserAfterAuth,
-  // ): Promise<CreateVideoResDto> {
-  //   const { mimetype, originalname, buffer } = file;
-  //   const extension = originalname.split('.')[1];
-  //   const video = await this.videoService.create(
-  //     id,
-  //     title,
-  //     mimetype,
-  //     extension,
-  //     buffer,
-  //   );
-  //   return CreateVideoResDto.toDto(video);
-  // }
 
   // 비디오 목록조회
   @ApiBearerAuth()
@@ -130,27 +118,16 @@ export class VideoController {
           email: user.email,
         },
       };
+      // return { items: videos.map((video) => FindVideoResDto.toDto(video))
     });
   }
-
-  // @ApiBearerAuth()
-  // @SkipThrottle() // ThrottlerBehindProxyGuard 적용 안받음.
-  // @ApiGetItemsResponse(FindVideoResDto)
-  // @ApiOperation({ summary: '비디오 목록조회' })
-  // @Get()
-  // async findAll(
-  //   @Query() { page, size }: PageReqDto,
-  // ): Promise<{ items: FindVideoResDto[] }> {
-  //   const videos = await this.videoService.findAll(page, size);
-  //   return { items: videos.map((video) => FindVideoResDto.toDto(video)) };
-  // }
 
   // 비디오 ID로 찾기
   @ApiBearerAuth()
   @ApiOperation({ summary: '비디오 상세조회' })
   @ApiGetResponse(FindVideoResDto)
   @Get(':id')
-  async findOne(@Param() { id }: FindVideoReqDto) {
+  async findOne(@Param() { id }: FindVideoReqDto): Promise<FindVideoResDto> {
     const video = await this.videoService.findOne(id);
     return FindVideoResDto.toDto(video);
   }
@@ -163,7 +140,7 @@ export class VideoController {
   async play(
     // @Headers('Sec-Fetch-Dest') setFetchDest: 'document' | 'video',
     @Param() { id }: FindVideoReqDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response, // 해당 응답을 미들웨어 및 다른 요청 핸들러에게 전달할 수 있도록 허용
   ): Promise<StreamableFile> {
     const { stream, mimetype, size } = await this.videoService.download(id);
     res.set({
