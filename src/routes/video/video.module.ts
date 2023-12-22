@@ -11,11 +11,7 @@ import { VideoCreatedHandler } from './handler/video-created.handler';
 import { FindVideosQueryHandler } from './handler/find-videos.handler';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Video, User]),
-    AnalyticsModule,
-    CqrsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Video, User]), CqrsModule],
   controllers: [VideoController],
   providers: [
     VideoService,
@@ -23,5 +19,6 @@ import { FindVideosQueryHandler } from './handler/find-videos.handler';
     VideoCreatedHandler,
     FindVideosQueryHandler,
   ],
+  exports: [VideoService],
 })
 export class VideoModule {}

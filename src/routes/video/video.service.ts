@@ -50,6 +50,18 @@ export class VideoService {
     return { stream, mimetype, size };
   }
 
+  // 다운로드 횟수가 가장 높은 Top5 비디오 찾기
+  async findTop5Download() {
+    const videos = await this.videoRepository.find({
+      relations: ['user'],
+      order: {
+        downloadCount: 'DESC',
+      },
+      take: 5,
+    });
+    return videos;
+  }
+
   // async create(
   //   userId: string,
   //   title: string,
