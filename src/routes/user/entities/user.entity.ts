@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { UserRole } from '../enum/user.enum';
 import { RefreshToken } from 'src/routes/auth/entities/refreshToken.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User {
@@ -18,13 +19,16 @@ export class User {
   id: string;
 
   @Index('user-Email-idx')
+  @ApiProperty({ description: '이메일' })
   @Column({ unique: true })
   email: string;
 
   @Column()
+  @ApiProperty({ description: '비밀번호' })
   password: string;
 
   @Column()
+  @ApiProperty({ description: '이름' })
   name: string;
 
   @Column({
@@ -33,6 +37,7 @@ export class User {
     default: UserRole.Normal,
     // nullable: true,
   })
+  @ApiProperty({ description: '신분' })
   role: UserRole;
 
   @CreateDateColumn({ name: 'createdat' })

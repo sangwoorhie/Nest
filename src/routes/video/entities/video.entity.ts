@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/routes/user/entities/user.entity';
 import {
   Column,
@@ -15,12 +16,15 @@ export class Video {
   id: string;
 
   @Column()
+  @ApiProperty({ description: '비디오 제목' })
   title: string;
 
   @Column()
+  @ApiProperty({ description: 'MIME 타입' })
   mimetype: string;
 
   @Column({ name: 'downloadCount', default: 0 })
+  @ApiProperty({ description: '비디오 다운로드 횟수' })
   downloadCount: number;
 
   @CreateDateColumn({ name: 'createdAt' })

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/routes/user/entities/user.entity';
 import {
   Entity,
@@ -15,6 +16,7 @@ export class RefreshToken {
   id: string;
 
   @Column()
+  @ApiProperty({ description: '토큰' })
   token: string;
 
   @CreateDateColumn({ name: 'createdat' })
