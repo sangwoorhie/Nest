@@ -16,7 +16,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  // 유저 목록조회
+  // 1. 유저 목록조회
   async findAll(page: number, size: number) {
     const users = this.userRepository.find({
       skip: (page - 1) * size,
@@ -25,7 +25,7 @@ export class UserService {
     return users;
   }
 
-  // 유저 1명 조회 (이메일로 조회, authService와 연결)
+  // 2. 유저 1명 조회 (이메일로 조회)
   async findUserByEmail(email: string) {
     const user = await this.userRepository.findOneBy({ email });
     if (!user)
@@ -33,7 +33,7 @@ export class UserService {
     return user;
   }
 
-  // 회원 정보 수정
+  // 3. 회원 정보 수정
   async updateUser(
     confirmPassword: string,
     newPassword: string,
@@ -56,7 +56,7 @@ export class UserService {
     return this.userRepository.findOne({ where: { id: user.id } });
   }
 
-  // 회원 탈퇴
+  // 4. 회원 탈퇴
   async deleteUser(confirmPassword: string, user): Promise<any> {
     const comparedPassword = await bcrypt.compare(
       confirmPassword,

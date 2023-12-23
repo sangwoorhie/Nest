@@ -38,7 +38,7 @@ import { UserRole } from './enum/user.enum';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // 유저 목록조회
+  // 1. 유저 목록조회
   @ApiBearerAuth()
   @ApiGetItemsResponse(FindUserResDto)
   @Roles(UserRole.Admin) // 관리자만 조회가능
@@ -53,7 +53,7 @@ export class UserController {
     return { items: users.map((user) => FindUserResDto.toDto(user)) };
   }
 
-  // 유저 1명 조회 (이메일로 조회)
+  // 2. 유저 1명 조회 (이메일로 조회)
   @ApiBearerAuth()
   @ApiGetResponse(FindUserResDto)
   @UseGuards(JwtAuthGuard)
@@ -66,7 +66,7 @@ export class UserController {
     return FindUserResDto.toDto(user);
   }
 
-  // 회원 정보 수정
+  // 3. 회원 정보 수정
   @ApiBearerAuth()
   @ApiGetResponse(EditUserResDto)
   @UseGuards(JwtAuthGuard)
@@ -85,7 +85,7 @@ export class UserController {
     return EditUserResDto.toDto(updatedUser);
   }
 
-  // 회원 탈퇴
+  // 4. 회원 탈퇴
   @ApiBearerAuth()
   @ApiGetResponse(DeleteUserResDto)
   @UseGuards(JwtAuthGuard)

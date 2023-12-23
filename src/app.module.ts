@@ -43,7 +43,9 @@ import emailConfig from './config/email.config';
           database: configService.get('postgres.database'),
           username: configService.get('postgres.username'),
           password: configService.get('postgres.password'),
-          entities: [__dirname + '/../**/*.entity.{js,ts}'],
+          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          migrations: [__dirname + '/../**/migrations/*{.ts,.js}'],
+          migrationsTableName: 'migrations',
           autoLoadEntities: true,
           ssl: {
             rejectUnauthorized: false,
