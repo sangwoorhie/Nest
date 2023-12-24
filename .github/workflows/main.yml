@@ -39,7 +39,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
-          context:
+          context: .
           build-args: |
             "STAGE=${{ secrets.STAGE }}"
             "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}"
@@ -52,18 +52,18 @@ jobs:
             "SWAGGER_PASSWORD=${{ secrets.SWAGGER_PASSWORD }}"
             "BCRYPT_SALT=${{ secrets.BCRYPT_SALT }}"
 
-deploy:
-  needs: build
-  name: Deploy
-  runs-on: [self-hosted, Linux, x64]
-  steps:
-    - name: Login to ghcr
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_TOKEN }}
-    - name: Docker run
-      run: |
-        docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-        docker run --add-host=host.docker.internal:host-gateway -d -p 80:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: [self-hosted, Linux, x64]
+    steps:
+      - name: Login to ghcr
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Docker run
+        run: |
+          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
+          docker run --add-host=host.docker.internal:host-gateway -d -p 80:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
