@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
 
 // Jest를 활용한 UserService 단위테스트 : npm run test
 class MockRepository {

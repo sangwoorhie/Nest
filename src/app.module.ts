@@ -43,19 +43,17 @@ import emailConfig from './config/email.config';
           database: configService.get('postgres.database'),
           username: configService.get('postgres.username'),
           password: configService.get('postgres.password'),
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-          migrations: [__dirname + '/../**/migrations/*{.ts,.js}'],
-          migrationsTableName: 'migrations',
           autoLoadEntities: true,
           ssl: {
             rejectUnauthorized: false,
           },
+          synchronize: false,
         };
         // 주의! development 환경에서만 개발 편의성을 위해 활용
         if (configService.get('NODE_ENV') === 'development') {
           // console.info('Sync TypeORM');
           obj = Object.assign(obj, {
-            synchronize: true,
+            // synchronize: true,
             logging: true,
           });
         }
@@ -77,3 +75,6 @@ export class AppModule implements NestModule {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
+
+// npm run typeorm migration:generate src/migrations/Init
+// npm run typeorm migration:run
