@@ -7,7 +7,7 @@ RUN mkdir -p video-storage
 
 # ubuntu 환경에서 bcrypt가 문제가 될수있으므로 지우고 재 설치, 의존성 설치
 RUN npm uninstall bcrypt
-RUN npm install bcrypt --force
+RUN npm install bcrypt
 RUN npm install
 RUN npm run build
 
