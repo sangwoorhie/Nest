@@ -47,12 +47,20 @@ export class SignupReqDto {
 
 // 로그인 요청 DTO
 export class SigninReqDto {
-  @ApiProperty({ required: true, example: 'nestjs@naver.com' })
+  @ApiProperty({
+    required: true,
+    description: 'E-mail',
+    example: 'nestjs@naver.com',
+  })
   @IsEmail()
   @MaxLength(30)
   email: string;
 
-  @ApiProperty({ required: true, example: 'Password123@' })
+  @ApiProperty({
+    required: true,
+    description: '비밀번호',
+    example: 'Password123@',
+  })
   @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,20}$/)
   password: string;
 }
