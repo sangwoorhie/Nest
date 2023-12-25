@@ -9,7 +9,7 @@ RUN mkdir -p video-storage
 RUN npm uninstall bcrypt
 RUN npm install bcrypt --force
 RUN npm install
-RUN npm build
+RUN npm run build
 
 # 환경변수
 ARG STAGE
