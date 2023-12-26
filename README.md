@@ -1,30 +1,47 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Video Project
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<p align="center"><img src="https://github.com/fresh502/nestjs/assets/131964697/b7a0dcca-ed6f-4a8a-a0f2-f90021862240"></p>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## 🎯서비스 소개
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Video Project는 사용자가 회원가입 및 로그인을 하고, 비디오를 업로드 한 다음 다운로드까지 받을 수 있는 서비스입니다.<br>
+포트폴리오 : [Video_Project_Portfolio](https://lemon-coin-768.notion.site/Video_Project-Portfolio-8aeff45845354f59bf6e6b77f50dda99?pvs=4)
+<br>
+<br>
+
+## 🔎주요 기능
+
+
+- 회원가입, 로그인, 로그아웃 
+- 회원정보 수정, 회원탈퇴, 유저목록조회, 유저E-mail 조회
+- 비디오 생성(업로드), 비디오 목록조회, 비디오 ID조회, 비디오 다운로드
+  <br>
+  <br>
+
+
+## ⚒️Project Architecture
+
+<p align="center"><img src="https://github.com/sangwoorhie/Survey_Graphql/assets/131964697/f6e75d03-c59f-4f5b-8cec-c61087c137de"></p>
+<br>
+<br>
+
+## 🖋️Tech Stack
+
+- Typescript 5.2.2
+- Node.js 18.17.0
+- NestJS 10.3.0
+- Postgres 14.6
+- Docker
+- Git, Github
+<br>
+<br>
+
+## 📊ERD
+
+<p align="center"><img src="https://github.com/sangwoorhie/Survey_Graphql/assets/131964697/a163285c-f930-40ff-8786-030afb599540"></p>
+<br>
+<br>
 
 ## Installation
 
@@ -58,16 +75,33 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## 도커
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 참고 자료
 
-## Stay in touch
+  - https://docs.docker.com/
+  - https://aws.amazon.com/ko/docker/
+-
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 설치 및 컨테이너 올리기
 
-## License
+- https://www.docker.com/
 
-Nest is [MIT licensed](LICENSE).
+```bash
+# docker-compose
+$ docker-compose down && docker-compose up
+
+# 컨테이너 확인
+$ docker ps --all
+
+# 로컬호스트에서 Postgres에 psql로 바로 접속
+$ psql -U nestjs -h localhost -p 5434
+
+# 실행중인 도커 컨테이너에서 프로세스 실행. 셸을 실행해서 인터렉티브한 환경에서 컨테이너 환경을 탐색하는 것도 가능
+# docker exec -it <CONTAINER_ID> <COMMAND>
+$ docker exec -it <CONTAINER_ID> psql -U postgres
+
+# 컨테이너 중지 및 삭제
+$ docker stop <CONTAINER_ID>
+$ docker rm <CONTAINER_ID>
+```
