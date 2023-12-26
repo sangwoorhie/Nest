@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -31,6 +32,7 @@ import { DeleteUserReqDto, EditUserReqDto } from './dto/req.dto';
 import { User, UserAfterAuth } from 'src/common/decorator/user.decorator';
 import { Roles } from 'src/common/decorator/role.decorator';
 import { UserRole } from './enum/user.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('User')
 @ApiExtraModels(FindUserResDto, PageReqDto, PageResDto)
@@ -97,5 +99,12 @@ export class UserController {
   ): Promise<DeleteUserResDto> {
     await this.userService.deleteUser(confirmPassword, user);
     return new DeleteUserResDto(user.id);
+  }
+
+  // 유저 bulk생성용 임시API
+  @Public()
+  @Post('bulk')
+  createBulk() {
+    return this.userService.createBulk();
   }
 }

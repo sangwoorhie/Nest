@@ -40,10 +40,10 @@ export class User {
   @ApiProperty({ description: '신분' })
   role: UserRole;
 
-  @CreateDateColumn({ name: 'createdat' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedat' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
   @OneToMany(() => Video, (video) => video.user)

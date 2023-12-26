@@ -19,10 +19,10 @@ export class RefreshToken {
   @ApiProperty({ description: '토큰' })
   token: string;
 
-  @CreateDateColumn({ name: 'createdat' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedat' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
   @OneToOne(() => User, (user) => user.refreshToken)

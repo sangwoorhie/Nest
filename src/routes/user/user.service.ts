@@ -80,4 +80,16 @@ export class UserService {
     const saltRounds = process.env.BCRYPT_SALT;
     return await bcrypt.hash(password, saltRounds);
   }
+
+  // 유저 벌크생성 임시 API
+  async createBulk() {
+    for (let i = 1; i <= 100000; i++) {
+      const bulkUsers = this.userRepository.create({
+        email: `bulkUsers${i}@nest.com`,
+        password: `Password123@`,
+      });
+      this.userRepository.save(bulkUsers);
+    }
+    return;
+  }
 }
