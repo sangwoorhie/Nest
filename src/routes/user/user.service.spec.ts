@@ -1,4 +1,3 @@
-import { IsEmail } from 'class-validator';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './user.service';
@@ -20,13 +19,13 @@ class MockRepository {
       { id: '1', email: 'user1@example.com', name: 'User 1' },
       { id: '2', email: 'user2@example.com', name: 'User 2' },
       { id: '3', email: 'user3@example.com', name: 'User 3' },
-      { id: '1', email: 'user1@example.com', name: 'User 4' },
-      { id: '2', email: 'user2@example.com', name: 'User 5' },
-      { id: '3', email: 'user3@example.com', name: 'User 6' },
-      { id: '1', email: 'user1@example.com', name: 'User 7' },
-      { id: '2', email: 'user2@example.com', name: 'User 8' },
-      { id: '3', email: 'user3@example.com', name: 'User 9' },
-      { id: '3', email: 'user3@example.com', name: 'User 10' },
+      { id: '4', email: 'user1@example.com', name: 'User 4' },
+      { id: '5', email: 'user2@example.com', name: 'User 5' },
+      { id: '6', email: 'user3@example.com', name: 'User 6' },
+      { id: '7', email: 'user1@example.com', name: 'User 7' },
+      { id: '8', email: 'user2@example.com', name: 'User 8' },
+      { id: '9', email: 'user3@example.com', name: 'User 9' },
+      { id: '10', email: 'user3@example.com', name: 'User 10' },
     ];
     const { skip, take } = options;
     const paginatedUsers = mockUsers.slice(skip, skip + take);
